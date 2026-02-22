@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TT Typographer</title>
+  <style>/* __INLINE_CSS__ */</style>
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="rules" id="tab-rules">Правила</button>
+      <button class="tab" data-tab="ai" id="tab-ai">AI-режим</button>
+    </div>
+
+    <!-- Rules Tab -->
+    <div class="tab-content active" id="content-rules">
+      <!-- Locale selector -->
+      <div class="locale-selector">
+        <label for="locale-select">Язык текста</label>
+        <select id="locale-select">
+          <option value="auto" selected>Автоопределение</option>
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+
+      <!-- Rules list (populated dynamically) -->
+      <div id="rules-container"></div>
+
+      <!-- Preview -->
+      <div class="preview-section" id="preview-section" style="display:none">
+        <div id="preview-container"></div>
+      </div>
+    </div>
+
+    <!-- AI Tab -->
+    <div class="tab-content" id="content-ai">
+      <div class="ai-section">
+        <div class="ai-field">
+          <label for="ai-provider">Провайдер</label>
+          <select id="ai-provider">
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="openai">OpenAI (GPT)</option>
+          </select>
+        </div>
+
+        <div class="ai-field">
+          <label for="ai-apikey">API-ключ</label>
+          <input type="password" id="ai-apikey" placeholder="sk-...">
+        </div>
+
+        <div class="ai-field">
+          <label for="ai-mode">Режим</label>
+          <select id="ai-mode">
+            <option value="typography">Типографика</option>
+            <option value="proofread">Корректура</option>
+            <option value="style">Стиль</option>
+            <option value="custom">Свой промпт</option>
+          </select>
+        </div>
+
+        <div class="ai-field" id="style-variant-field" style="display:none">
+          <label for="ai-style-variant">Вариант стиля</label>
+          <select id="ai-style-variant">
+            <option value="formal">Формальный</option>
+            <option value="casual">Разговорный</option>
+            <option value="marketing">Маркетинг</option>
+          </select>
+        </div>
+
+        <div class="ai-field" id="custom-prompt-field" style="display:none">
+          <label for="ai-custom-prompt">Свой промпт</label>
+          <textarea id="ai-custom-prompt" placeholder="Исправь типографику текста..."></textarea>
+        </div>
+
+        <div class="ai-warning">
+          ⚠ Текст будет отправлен на сервер AI-провайдера для обработки.
+        </div>
+
+        <div class="loading" id="ai-loading">
+          <div class="spinner"></div>
+          <span>Обработка...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer with buttons -->
+    <div class="footer">
+      <button class="btn btn-secondary" id="btn-preview">Превью</button>
+      <button class="btn btn-primary" id="btn-apply">Применить</button>
+    </div>
+  </div>
+
+  <script>/* __INLINE_JS__ */</script>
+</body>
+</html>

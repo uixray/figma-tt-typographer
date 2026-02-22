@@ -1,0 +1,25 @@
+{
+  "name": "TT Typographer",
+  "id": "1559319699733700359",
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://api.anthropic.com",
+      "https://api.openai.com"
+    ]
+  },
+  "api": "1.0.0",
+  "editorType": ["figma"],
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "menu": [
+    {
+      "name": "Типографировать",
+      "command": "apply_quick"
+    },
+    {
+      "name": "Настроить и применить...",
+      "command": "open_settings"
+    }
+  ]
+}

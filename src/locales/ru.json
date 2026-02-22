@@ -1,0 +1,70 @@
+{
+  "title": "TT Typographer",
+  "tabs": {
+    "rules": "Правила",
+    "ai": "AI-режим"
+  },
+  "locale": {
+    "label": "Язык текста",
+    "auto": "Автоопределение",
+    "ru": "Русский",
+    "en": "English",
+    "fr": "Français",
+    "zh": "中文",
+    "ja": "日本語"
+  },
+  "groups": {
+    "case": "Регистр",
+    "yo": "Ёфикация",
+    "quotes": "Кавычки",
+    "dashes": "Тире",
+    "spaces": "Пробелы",
+    "numbers": "Числа",
+    "currency": "Валюта",
+    "punctuation": "Пунктуация",
+    "special": "Спецсимволы",
+    "width": "Ширина символов"
+  },
+  "buttons": {
+    "apply": "Применить",
+    "preview": "Превью",
+    "cancel": "Отмена"
+  },
+  "ai": {
+    "provider": "Провайдер",
+    "apiKey": "API-ключ",
+    "apiKeyPlaceholder": "sk-...",
+    "mode": "Режим",
+    "modes": {
+      "typography": "Типографика",
+      "proofread": "Корректура",
+      "style": "Стиль",
+      "custom": "Свой промпт"
+    },
+    "styleVariant": "Вариант стиля",
+    "styles": {
+      "formal": "Формальный",
+      "casual": "Разговорный",
+      "marketing": "Маркетинг"
+    },
+    "customPrompt": "Свой промпт",
+    "customPromptPlaceholder": "Исправь типографику...",
+    "process": "Обработать AI",
+    "processing": "Обработка...",
+    "warning": "Текст будет отправлен на сервер AI-провайдера.",
+    "tokensUsed": "Использовано токенов",
+    "saveKey": "Сохранить ключ"
+  },
+  "preview": {
+    "title": "Превью изменений",
+    "original": "Было",
+    "result": "Стало",
+    "noChanges": "Изменений нет"
+  },
+  "messages": {
+    "noSelection": "Выделите текстовые слои",
+    "noTextNodes": "Текстовых слоёв не найдено",
+    "applied": "Применено к {count} слоям",
+    "noChanges": "Текст уже в порядке!"
+  }
+}

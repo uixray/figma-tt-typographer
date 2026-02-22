@@ -1,0 +1,17 @@
+{
+  "name": "tt-typographer",
+  "version": "2.0.0",
+  "description": "Figma plugin for professional typography across multiple languages with AI mode",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.100.0",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}
