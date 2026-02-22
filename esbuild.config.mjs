@@ -12,7 +12,7 @@ const mainConfig = {
   bundle: true,
   outfile: resolve(__dirname, 'dist/code.js'),
   format: 'iife',
-  target: 'es2020',
+  target: 'es2017',
   minify: !isWatch,
 };
 
@@ -22,7 +22,7 @@ const uiConfig = {
   bundle: true,
   outfile: resolve(__dirname, 'dist/ui.js'),
   format: 'iife',
-  target: 'es2020',
+  target: 'es2017',
   minify: !isWatch,
 };
 
