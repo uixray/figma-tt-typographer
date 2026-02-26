@@ -1,5 +1,6 @@
 import type { TypographyRule } from '../../core/rule';
 import { defineRule } from '../../core/rule';
+import { nbspOrphan } from './orphan';
 
 /** Remove multiple consecutive spaces (but not non-breaking spaces) */
 const removeDoubleSpaces = defineRule({
@@ -80,4 +81,5 @@ export const commonRules: TypographyRule[] = [
   plusMinus,
   ellipsis,
   duplicatePunctuation,
+  nbspOrphan,
 ];

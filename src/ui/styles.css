@@ -252,3 +252,219 @@ body {
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Provider section */
+.provider-section { margin-top: 4px; }
+
+.provider-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.provider-section-title {
+  font-weight: 600;
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.provider-actions { display: flex; gap: 4px; }
+
+.btn-icon {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: all 0.15s;
+}
+
+.btn-icon:hover { background: #f0f0f0; color: #333; }
+.btn-icon.btn-add { color: #0d99ff; font-weight: 700; }
+.btn-icon.btn-delete { color: #d32f2f; }
+.btn-icon.btn-delete:hover { background: #ffebee; }
+
+/* Provider group card */
+.provider-group-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.provider-group-card.disabled { opacity: 0.5; }
+
+.provider-group-header {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+}
+
+.provider-group-name { font-weight: 600; font-size: 12px; }
+.provider-group-actions { display: flex; gap: 2px; }
+
+.provider-group-key {
+  padding: 2px 10px 6px;
+  font-size: 10px;
+  color: #999;
+  font-family: monospace;
+}
+
+.provider-group-models { padding: 0 4px 4px; }
+
+.provider-model-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.provider-model-item:hover { background: #f8f8f8; }
+.provider-model-item input[type="checkbox"] { margin: 0; accent-color: #0d99ff; }
+
+.provider-empty {
+  padding: 16px;
+  text-align: center;
+  color: #999;
+  font-size: 11px;
+}
+
+/* Add provider panel */
+.add-provider-panel {
+  background: #fff;
+  border: 1px solid #0d99ff;
+  border-radius: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.add-provider-header {
+  padding: 8px 10px;
+  background: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 12px;
+  color: #0d99ff;
+}
+
+.add-provider-form { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+.btn-full { width: 100%; flex: none; }
+
+/* Provider catalog */
+.catalog-category { margin-bottom: 6px; padding: 0 8px; }
+
+.catalog-category-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 2px 4px;
+}
+
+.catalog-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+  border-radius: 4px;
+}
+
+.catalog-item:hover { background: #e3f2fd; color: #0d99ff; }
+
+/* Layout section */
+.layout-section {
+  margin-top: 12px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.layout-section .rule-group-header {
+  border-bottom: none;
+}
+
+.layout-section .rule-item {
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Balance sub-options */
+.balance-options {
+  padding: 6px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.balance-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  min-width: 52px;
+}
+
+/* Segmented control */
+.segmented-control {
+  display: flex;
+  background: #e8e8e8;
+  border-radius: 5px;
+  padding: 2px;
+  flex: 1;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.seg-btn.active {
+  background: #fff;
+  color: #333;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.seg-btn:hover:not(.active) {
+  color: #333;
+}

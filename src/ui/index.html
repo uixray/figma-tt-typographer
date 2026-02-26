@@ -16,7 +16,6 @@
 
     <!-- Rules Tab -->
     <div class="tab-content active" id="content-rules">
-      <!-- Locale selector -->
       <div class="locale-selector">
         <label for="locale-select">Язык текста</label>
         <select id="locale-select">
@@ -28,11 +27,44 @@
           <option value="ja">日本語</option>
         </select>
       </div>
+      <!-- Layout section (post-processing features) -->
+      <div class="layout-section" id="layout-section">
+        <div class="rule-group-header">
+          <span>Макет</span>
+        </div>
 
-      <!-- Rules list (populated dynamically) -->
+        <!-- Chat Time Padding -->
+        <label class="rule-item">
+          <input type="checkbox" id="chat-time-padding">
+          <span>Отступ под время в чатах</span>
+        </label>
+
+        <!-- Text Balance -->
+        <label class="rule-item">
+          <input type="checkbox" id="balance-enabled">
+          <span>Балансировка текста</span>
+        </label>
+
+        <div class="balance-options" id="balance-options" style="display:none">
+          <div class="balance-row">
+            <span class="balance-label">Метод</span>
+            <div class="segmented-control" id="balance-method">
+              <button class="seg-btn active" data-value="container" type="button">Ширина</button>
+              <button class="seg-btn" data-value="nbsp" type="button">NBSP</button>
+            </div>
+          </div>
+          <div class="balance-row">
+            <span class="balance-label">Режим</span>
+            <div class="segmented-control" id="balance-strategy">
+              <button class="seg-btn active" data-value="balance" type="button">Balance</button>
+              <button class="seg-btn" data-value="pretty" type="button">Pretty</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="rules-container"></div>
 
-      <!-- Preview -->
       <div class="preview-section" id="preview-section" style="display:none">
         <div id="preview-container"></div>
       </div>
@@ -41,19 +73,15 @@
     <!-- AI Tab -->
     <div class="tab-content" id="content-ai">
       <div class="ai-section">
+        <!-- Active model selector -->
         <div class="ai-field">
-          <label for="ai-provider">Провайдер</label>
-          <select id="ai-provider">
-            <option value="anthropic">Anthropic (Claude)</option>
-            <option value="openai">OpenAI (GPT)</option>
+          <label for="ai-model-select">Модель</label>
+          <select id="ai-model-select">
+            <option value="">-- Нет провайдеров --</option>
           </select>
         </div>
 
-        <div class="ai-field">
-          <label for="ai-apikey">API-ключ</label>
-          <input type="password" id="ai-apikey" placeholder="sk-...">
-        </div>
-
+        <!-- AI mode -->
         <div class="ai-field">
           <label for="ai-mode">Режим</label>
           <select id="ai-mode">
@@ -78,8 +106,50 @@
           <textarea id="ai-custom-prompt" placeholder="Исправь типографику текста..."></textarea>
         </div>
 
+        <!-- Provider groups -->
+        <div class="provider-section">
+          <div class="provider-section-header">
+            <span class="provider-section-title">Провайдеры</span>
+            <div class="provider-actions">
+              <button class="btn-icon" id="btn-import" title="Импорт">&#8593;</button>
+              <button class="btn-icon" id="btn-export" title="Экспорт">&#8595;</button>
+              <button class="btn-icon btn-add" id="btn-add-provider" title="Добавить">+</button>
+            </div>
+          </div>
+          <div id="provider-groups-container"></div>
+        </div>
+
+        <!-- Add provider panel (hidden by default) -->
+        <div class="add-provider-panel" id="add-provider-panel" style="display:none">
+          <div class="add-provider-header">
+            <span>Добавить провайдера</span>
+            <button class="btn-icon" id="btn-close-add-panel">&times;</button>
+          </div>
+          <div id="provider-catalog"></div>
+          <div class="add-provider-form" id="add-provider-form" style="display:none">
+            <div class="ai-field">
+              <label for="new-provider-name">Название группы</label>
+              <input type="text" id="new-provider-name" placeholder="My OpenAI">
+            </div>
+            <div class="ai-field">
+              <label for="new-provider-apikey">API-ключ</label>
+              <input type="password" id="new-provider-apikey" placeholder="sk-...">
+            </div>
+            <div class="ai-field" id="new-provider-folderid-field" style="display:none">
+              <label for="new-provider-folderid">Folder ID (Yandex)</label>
+              <input type="text" id="new-provider-folderid" placeholder="b1g...">
+            </div>
+            <div class="ai-field" id="new-provider-url-field" style="display:none">
+              <label for="new-provider-url">URL сервера</label>
+              <input type="text" id="new-provider-url" placeholder="http://localhost:1234">
+            </div>
+            <div id="new-provider-models"></div>
+            <button class="btn btn-primary btn-full" id="btn-save-provider">Сохранить</button>
+          </div>
+        </div>
+
         <div class="ai-warning">
-          ⚠ Текст будет отправлен на сервер AI-провайдера для обработки.
+          Текст будет отправлен на сервер AI-провайдера для обработки.
         </div>
 
         <div class="loading" id="ai-loading">
@@ -88,6 +158,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="import-file-input" accept=".json" style="display:none">
 
     <!-- Footer with buttons -->
     <div class="footer">

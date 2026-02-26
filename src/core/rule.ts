@@ -12,7 +12,8 @@ export type RuleGroup =
   | 'case'
   | 'special'
   | 'yo'
-  | 'width';
+  | 'width'
+  | 'layout';
 
 /** Context passed to each rule during execution */
 export interface RuleContext {
@@ -44,14 +45,25 @@ export interface TypographyRule {
 export interface TypographySettings {
   locale: Locale | 'auto';
   enabledRules: Record<string, boolean>;
-  /** AI mode settings */
+  /** AI mode settings (V2.1 — provider groups) */
   ai?: {
     enabled: boolean;
-    provider: 'anthropic' | 'openai';
-    apiKey: string;
+    activeModelId: string;
     mode: 'typography' | 'proofread' | 'style' | 'custom';
     customPrompt?: string;
-    model?: string;
+    styleVariant?: string;
+  };
+  /** Text balancing settings (text-wrap: balance emulation) */
+  balance?: {
+    enabled: boolean;
+    /** container = resize width; nbsp = insert non-breaking spaces */
+    method: 'container' | 'nbsp';
+    /** balance = equalize all lines; pretty = prevent orphans only */
+    strategy: 'balance' | 'pretty';
+  };
+  /** Automatically pad chat message text with NBSP to avoid time overlap */
+  chatTimePadding?: {
+    enabled: boolean;
   };
 }
 

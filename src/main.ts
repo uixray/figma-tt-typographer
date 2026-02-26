@@ -1,9 +1,10 @@
-import { applyTypography, getAllRules, getRulesForLocale } from './core/engine';
-import { detectLocale } from './core/detector';
-import type { TypographySettings, Locale } from './core/rule';
-import { DEFAULT_SETTINGS } from './core/rule';
+import { applyTypography, getAllRules } from './core/engine';
+import type { TypographySettings } from './core/rule';
 import { findTextNodes, loadFontsForNodes, applyTextPreservingStyles } from './utils/figma';
-import { loadSettings, saveSettings } from './utils/storage';
+import { loadSettings, saveSettings, loadProviderGroups, saveProviderGroups } from './utils/storage';
+import { getProvidersByCategory } from './shared/providers';
+import type { ProviderGroup } from './shared/provider-types';
+import { applyChatTimePadding, applyContainerBalance, isInsideInstance } from './core/balance';
 
 // --- Message types between main thread and UI ---
 
@@ -26,7 +27,17 @@ interface RequestPreviewMsg {
   settings: TypographySettings;
 }
 
-type PluginMessage = ApplyTypographyMsg | ApplyAiMsg | RequestSettingsMsg | RequestPreviewMsg;
+interface SaveProvidersMsg {
+  type: 'save-providers';
+  providerGroups: ProviderGroup[];
+}
+
+interface ApplyAiResultsMsg {
+  type: 'apply-ai-results';
+  results: Array<{ nodeId: string; newText: string }>;
+}
+
+type PluginMessage = ApplyTypographyMsg | ApplyAiMsg | RequestSettingsMsg | RequestPreviewMsg | SaveProvidersMsg | ApplyAiResultsMsg;
 
 // --- Core logic ---
 
@@ -37,7 +48,6 @@ async function runTypography(settings: TypographySettings): Promise<void> {
     return;
   }
 
-  // Find all text nodes
   const textNodes: TextNode[] = [];
   for (const node of selectedNodes) {
     textNodes.push(...findTextNodes(node));
@@ -48,32 +58,57 @@ async function runTypography(settings: TypographySettings): Promise<void> {
     return;
   }
 
-  // Load fonts (with proper deduplication)
   await loadFontsForNodes(textNodes);
 
-  // Apply typography
   let changesCount = 0;
+  let balanceCount = 0;
+
   for (const node of textNodes) {
     const originalText = node.characters;
-    const typographedText = applyTypography(originalText, settings);
+    let newText = applyTypography(originalText, settings);
 
-    if (originalText !== typographedText) {
-      // Use style-preserving text replacement
-      const changed = applyTextPreservingStyles(node, typographedText);
+    // Post-processing: Chat Time Padding
+    // Appends NBSP to chat message text so time element doesn't overlap
+    if (settings.chatTimePadding?.enabled) {
+      const paddedText = applyChatTimePadding(node, newText);
+      if (paddedText !== null) {
+        newText = paddedText;
+      }
+    }
+
+    // Apply text changes (typography rules + chat padding)
+    if (originalText !== newText) {
+      const changed = applyTextPreservingStyles(node, newText);
       if (changed) changesCount++;
+    }
+
+    // Post-processing: Container Scale (text-wrap: balance)
+    // Resizes text block width to balance line lengths
+    if (settings.balance?.enabled && settings.balance.method === 'container') {
+      if (!isInsideInstance(node)) {
+        const balanced = applyContainerBalance(node);
+        if (balanced) balanceCount++;
+      }
     }
   }
 
-  // Save settings for next time
   await saveSettings(settings);
 
-  const message = changesCount > 0
-    ? `Типографика применена к ${changesCount} текстовым слоям.`
+  // Build status message
+  const parts: string[] = [];
+  if (changesCount > 0) {
+    parts.push(`типографика: ${changesCount} слоёв`);
+  }
+  if (balanceCount > 0) {
+    parts.push(`баланс: ${balanceCount} слоёв`);
+  }
+
+  const message = parts.length > 0
+    ? `Готово! ${parts.join(', ')}.`
     : 'Изменений не найдено. Текст уже в порядке!';
   figma.closePlugin(message);
 }
 
-/** Generate preview data (text before/after) for UI */
 function generatePreview(settings: TypographySettings): Array<{ original: string; result: string; name: string }> {
   const selectedNodes = figma.currentPage.selection;
   const textNodes: TextNode[] = [];
@@ -88,10 +123,25 @@ function generatePreview(settings: TypographySettings): Array<{ original: string
   }));
 }
 
+/** Build provider catalog for UI (grouped by category, minimal info) */
+function buildProviderCatalog(): Record<string, Array<{ id: string; name: string; provider: string; description: string }>> {
+  const byCategory = getProvidersByCategory();
+  const catalog: Record<string, Array<{ id: string; name: string; provider: string; description: string }>> = {};
+  for (const [category, configs] of Object.entries(byCategory)) {
+    catalog[category] = configs.map(c => ({
+      id: c.id,
+      name: c.name,
+      provider: c.provider,
+      description: c.description,
+    }));
+  }
+  return catalog;
+}
+
 // --- Command handling ---
 
 if (figma.command === 'open_settings') {
-  figma.showUI(__html__, { width: 340, height: 520, title: 'TT Typographer' });
+  figma.showUI(__html__, { width: 360, height: 560, title: 'TT Typographer' });
 
   figma.ui.onmessage = async (msg: PluginMessage) => {
     switch (msg.type) {
@@ -101,6 +151,7 @@ if (figma.command === 'open_settings') {
 
       case 'request-settings': {
         const settings = await loadSettings();
+        const providerGroups = await loadProviderGroups();
         const rules = getAllRules();
         const rulesInfo = rules.map(r => ({
           id: r.id,
@@ -113,26 +164,84 @@ if (figma.command === 'open_settings') {
           type: 'settings-data',
           settings,
           rules: rulesInfo,
+          providerGroups,
+          providerCatalog: buildProviderCatalog(),
         });
         break;
       }
 
       case 'request-preview': {
         const previews = generatePreview(msg.settings);
+        figma.ui.postMessage({ type: 'preview-data', previews });
+        break;
+      }
+
+      case 'apply-ai': {
+        // AI processing happens in the iframe (has network access)
+        // Step 1: Collect text nodes and send to UI for AI processing
+        const aiNodes = figma.currentPage.selection;
+        if (aiNodes.length === 0) {
+          figma.ui.postMessage({ type: 'ai-error', error: 'Выделите текстовые слои.' });
+          break;
+        }
+        const aiTextNodes: TextNode[] = [];
+        for (const node of aiNodes) {
+          aiTextNodes.push(...findTextNodes(node));
+        }
+        if (aiTextNodes.length === 0) {
+          figma.ui.postMessage({ type: 'ai-error', error: 'В выделении нет текстовых слоёв.' });
+          break;
+        }
+        // Load fonts in advance for when results come back
+        await loadFontsForNodes(aiTextNodes);
+        // Send texts to UI for AI processing
+        const textsForAi = aiTextNodes.map(n => ({ nodeId: n.id, text: n.characters, name: n.name }));
         figma.ui.postMessage({
-          type: 'preview-data',
-          previews,
+          type: 'ai-texts-data',
+          texts: textsForAi,
+          settings: msg.settings,
         });
         break;
       }
 
-      case 'apply-ai':
-        // AI processing happens in the iframe (has network access)
-        // The iframe sends the processed text back, and we apply it
-        await runTypography(msg.settings);
+      case 'apply-ai-results': {
+        // Step 3: Apply AI-processed texts back to Figma nodes
+        const resultsMsg = msg as ApplyAiResultsMsg;
+        let aiChanges = 0;
+        for (const { nodeId, newText } of resultsMsg.results) {
+          const node = figma.getNodeById(nodeId);
+          if (node && node.type === 'TEXT') {
+            const textNode = node as TextNode;
+            if (textNode.characters !== newText) {
+              // Ensure fonts are loaded for this node
+              const fonts = textNode.getRangeAllFontNames(0, textNode.characters.length);
+              await Promise.all(fonts.map(f => figma.loadFontAsync(f)));
+              const changed = applyTextPreservingStyles(textNode, newText);
+              if (changed) aiChanges++;
+            }
+          }
+        }
+        await saveSettings(resultsMsg.results.length > 0 ? await loadSettings() : await loadSettings());
+        figma.ui.postMessage({
+          type: 'ai-complete',
+          changesCount: aiChanges,
+          totalNodes: resultsMsg.results.length,
+        });
+        break;
+      }
+
+      case 'save-providers':
+        await saveProviderGroups(msg.providerGroups);
         break;
     }
   };
+} else if (figma.command === 'apply_balance') {
+  // Quick balance: apply Container Scale without opening UI
+  (async () => {
+    const settings = await loadSettings();
+    settings.balance = { enabled: true, method: 'container', strategy: 'balance' };
+    await runTypography(settings);
+  })();
 } else {
   // Quick apply with saved or default settings
   (async () => {
